@@ -108,22 +108,7 @@ function extend (Y) {
         }).join('')
       }
       toDelta () {
-        // check last character
-        // insert a newline as the last character, if neccessary
-        // (quill will do that automatically otherwise..)
-        var newLineCharacter = false
-        for (var i = this._content.length - 1; i >= 0; i--) {
-          var c = this._content[i]
-          if (c.val.constructor !== Array) {
-            if (c.val === '\n') {
-              newLineCharacter = true
-            }
-            break
-          }
-        }
-        if (!newLineCharacter) {
-          this.push('\n')
-        }
+        var i
 
         // create the delta
         var ops = []
@@ -451,39 +436,11 @@ function extend (Y) {
           if (op.delete != null) {
             this.delete(pos, op.delete)
           }
-          if (op.retain != null && _quill != null) {
+          if (op.retain != null) {
             var afterRetain = pos + op.retain
-            if (afterRetain > this.length) {
-              // debugger // TODO: check why this is still called..
-              // console.warn('Yjs internal: This should not happen')
-              let additionalContent = _quill.getText(this.length)
-              _quill.insertText(this.length, additionalContent)
-              // quill.deleteText(this.length + additionalContent.length, quill.getLength()) the api changed!
-              for (name in opAttributes) {
-                let format = {}
-                format[name] = false
-                format = this._formatAttributesForQuill(format)
-                // TODO: format expects falsy values now in order to remove formats
-                _quill.formatText(this.length + additionalContent.length, additionalContent.length, format)
-                // quill.deleteText(this.length, this.length + op.retain) the api changed!
-              }
-              this.insert(this.length, additionalContent)
-              // opAttributes = null
-            }
             for (name in opAttributes) {
               var attr = opAttributes[name]
               this.select(pos, afterRetain, name, attr)
-              /*
-              let format = {}
-              format[name] = attr == null ? false : attr
-              format = this._formatAttributesForQuill(format)
-              if (name === '_block') {
-                var removeFormat = {}
-                this._quillBlockFormats.forEach((f) => { removeFormat[f] = false })
-                _quill.formatText(pos, op.retain, removeFormat)
-              }
-              _quill.formatText(pos, op.retain, format)
-              */
             }
             pos = afterRetain
           }

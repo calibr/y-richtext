@@ -12,3 +12,5 @@ doc
 .idea
 .vscode
 jsconfig.json
+*.sublime-project
+*.sublime-workspace
